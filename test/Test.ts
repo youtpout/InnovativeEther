@@ -103,6 +103,40 @@ describe("Swap", function () {
 
         });
 
+        it("Approve", async function () {
+            // call deposit function
+            const amount = utils.parseEther("12.111");
+            const tx = await innovativeETH.deposit({ value: amount });
+            const receipt = await tx.wait();
+
+            // call approve
+            const tx2 = await innovativeETH.approve(bob.address, amount);
+            const receipt2 = await tx.wait();
+
+            // check allowance
+            const allowance = await innovativeETH.allowance(owner.address, bob.address);
+            expect(allowance).to.be.equal(amount);
+        });
+
+        it("Transfer", async function () {
+            // call deposit function
+            const amount = utils.parseEther("12.111");
+            const tx = await innovativeETH.deposit({ value: amount });
+            const receipt = await tx.wait();
+
+            // call approve
+            const tx2 = await innovativeETH.approve(bob.address, amount);
+            const receipt2 = await tx.wait();
+
+            // call transfer
+            const tx3 = await innovativeETH.transfer(bob.address, amount);
+            const receipt3 = await tx.wait();
+
+            // check balance
+            const balance = await innovativeETH.balanceOf(bob.address);
+            expect(balance).to.be.equal(amount);
+        });
+
     });
 
 });
