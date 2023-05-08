@@ -80,6 +80,29 @@ describe("Swap", function () {
             expect(balanceEnd).to.be.equal(0);
         });
 
+        it("Supply", async function () {
+
+            // call deposit function
+            const amount = utils.parseEther("12.111");
+            const tx = await innovativeETH.deposit({ value: amount });
+            const receipt = await tx.wait();
+
+            const amount2 = utils.parseEther("8.25");
+            const tx2 = await innovativeETH.connect(bob).deposit({ value: amount2 });
+            const receipt2 = await tx2.wait();
+
+            const amount3 = utils.parseEther("2.15");
+            const tx3 = await innovativeETH.withdraw(amount3);
+            const receipt3 = await tx3.wait();
+
+
+            // check if the supply is correct worked correctly
+            const supply = await innovativeETH.totalSupply();
+            const expectedSupply = amount.add(amount2).sub(amount3);
+            expect(supply).to.be.equal(expectedSupply);
+
+        });
+
     });
 
 });

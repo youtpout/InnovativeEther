@@ -73,7 +73,10 @@ contract InnovativeETH {
     }
 
     function totalSupply() public view returns (uint) {
-        return address(this).balance;
+        assembly {
+            mstore(0, balance(address()))
+            return(0, 0x20)
+        }
     }
 
     function approve(address guy, uint wad) public returns (bool) {
