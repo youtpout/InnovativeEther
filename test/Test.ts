@@ -27,6 +27,17 @@ describe("Swap", function () {
 
     describe("Test Contract", function () {
 
+
+        it("Infos", async function () {
+
+            const name = await innovativeETH.name();
+            const symbol = await innovativeETH.symbol();
+            const decimals = await innovativeETH.decimals();
+            expect(name).to.be.equal("Innovative Ether");
+            expect(symbol).to.be.equal("IETH");
+            expect(decimals).to.be.equal(decimals);
+        });
+
         it("Deposit", async function () {
 
             // check balance before deposit
@@ -38,6 +49,31 @@ describe("Swap", function () {
             // call deposit function
             const amount = utils.parseEther("555.123");
             const tx = await innovativeETH.deposit({ value: amount });
+            const receipt = await tx.wait();
+            const gasSpend = totalGasWei(receipt);
+
+            // check if the balance of the user correctly updated
+            const balanceAfterEth = await ethers.provider.getBalance(owner.address);
+            const balanceExpectedEth = balanceBeforeEth.sub(amount).sub(gasSpend);
+            expect(balanceAfterEth).to.be.equal(balanceExpectedEth);
+
+            // check if the innovative ether has the correct amount
+            const balanceAfter = await innovativeETH.balanceOf(owner.address);
+            expect(balanceAfter).to.be.equal(amount);
+        });
+
+
+        it("Receive", async function () {
+
+            // check balance before deposit
+            const balanceBeforeEth = await ethers.provider.getBalance(owner.address);
+
+            const balanceBefore = await innovativeETH.balanceOf(owner.address);
+            expect(balanceBefore).to.be.equal(0);
+
+            // call receive function
+            const amount = utils.parseEther("555.123");
+            const tx = await owner.sendTransaction({ to: addressIETH, value: amount });
             const receipt = await tx.wait();
             const gasSpend = totalGasWei(receipt);
 
@@ -124,12 +160,27 @@ describe("Swap", function () {
             const tx = await innovativeETH.deposit({ value: amount });
             const receipt = await tx.wait();
 
+            // call transfer
+            const tx3 = await innovativeETH.transfer(bob.address, amount);
+            const receipt3 = await tx.wait();
+
+            // check balance
+            const balance = await innovativeETH.balanceOf(bob.address);
+            expect(balance).to.be.equal(amount);
+        });
+
+        it("Transfer From", async function () {
+            // call deposit function
+            const amount = utils.parseEther("12.111");
+            const tx = await innovativeETH.deposit({ value: amount });
+            const receipt = await tx.wait();
+
             // call approve
             const tx2 = await innovativeETH.approve(bob.address, amount);
             const receipt2 = await tx.wait();
 
             // call transfer
-            const tx3 = await innovativeETH.transfer(bob.address, amount);
+            const tx3 = await innovativeETH.connect(bob).transferFrom(owner.address, bob.address, amount);
             const receipt3 = await tx.wait();
 
             // check balance
