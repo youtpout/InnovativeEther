@@ -40,9 +40,9 @@ contract InnovativeETH {
             // balanceOf[msg.sender] += msg.value;
             sstore(balanceHash, add(balanceValue, callvalue()))
 
-            mstore(0x100, callvalue())
+            mstore(0, callvalue())
             //emit Deposit(msg.sender, msg.value);
-            log2(0x100, 0x20, depositTopic, caller())
+            log2(0, 0x20, depositTopic, caller())
         }
     }
 
@@ -67,8 +67,8 @@ contract InnovativeETH {
             }
 
             //  emit Withdrawal(msg.sender, wad);
-            mstore(0x100, wad)
-            log2(0x100, 0x20, withdrawalTopic, caller())
+            mstore(0, wad)
+            log2(0, 0x20, withdrawalTopic, caller())
         }
     }
 
@@ -81,9 +81,24 @@ contract InnovativeETH {
     }
 
     function approve(address guy, uint wad) public returns (bool) {
-        allowance[msg.sender][guy] = wad;
-        emit Approval(msg.sender, guy, wad);
-        return true;
+        assembly {
+            //   allowance[msg.sender][guy] = wad;
+            mstore(0x0, caller())
+            mstore(0x20, allowance.slot)
+            let callerHash := keccak256(0x0, 0x40)
+            mstore(0x00, guy)
+            mstore(0x20, callerHash)
+            let allowanceSlot := keccak256(0x0, 0x40)
+            sstore(allowanceSlot, wad)
+
+            //  emit Approval(msg.sender, guy, wad);
+            mstore(0, wad)
+            log3(0, 0x20, approvalTopic, caller(), guy)
+
+            // return true;
+            mstore(0, 1)
+            return(0, 0x20)
+        }
     }
 
     function transfer(address dst, uint wad) public returns (bool) {
@@ -143,8 +158,8 @@ contract InnovativeETH {
             sstore(balanceHashDst, add(balanceValueDst, wad))
 
             // emit Transfer(src, dst, wad);
-            mstore(0x100, wad)
-            log3(0x100, 0x20, transferTopic, src, dst)
+            mstore(0, wad)
+            log3(0, 0x20, transferTopic, src, dst)
 
             // return true;
             mstore(0, 1)
