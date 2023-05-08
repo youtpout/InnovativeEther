@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Credits Eddy Boughioul
+// Credits Eddy B.
 pragma solidity =0.8.18;
 
 contract InnovativeETH {
