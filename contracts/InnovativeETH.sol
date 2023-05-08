@@ -74,6 +74,7 @@ contract InnovativeETH {
 
     function totalSupply() public view returns (uint) {
         assembly {
+            // return address(this).balance;
             mstore(0, balance(address()))
             return(0, 0x20)
         }
