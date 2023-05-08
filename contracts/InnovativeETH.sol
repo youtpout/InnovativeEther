@@ -3,9 +3,9 @@
 pragma solidity =0.8.18;
 
 contract InnovativeETH {
-    string public name = "Innovative Ether";
-    string public symbol = "IETH";
-    uint8 public decimals = 18;
+    string public constant name = "Innovative Ether";
+    string public constant symbol = "IETH";
+    uint8 public constant decimals = 18;
     uint256 public constant maxValue = 2 ** 256 - 1;
 
     event Approval(address indexed src, address indexed guy, uint wad);
